@@ -516,9 +516,9 @@ class HTML_OSappscheduleOrders{
                                 <th width="5%">
                                     <?php echo JText::_('OS_CHECKED_IN');?>
                                 </th>
-								<th width="5%">
-									<?php echo JText::_('OS_REMOVE');?>
-								</th>
+								<!--<th width="5%">
+									<?php //echo JText::_('OS_REMOVE');?>
+								</th>-->
 							</tr>
 						</thead>
 						<tfoot>
@@ -612,11 +612,11 @@ class HTML_OSappscheduleOrders{
                                         }
                                         ?>
                                     </td>
-									<td width="10%" style="text-align:center;">
-										<a href="javascript:removeService(<?php echo $item->id?>,<?php echo $row->id?>);" title="<?php echo JText::_('OS_REMOVE_ORDER_ITEM');?>">
-											<img src="<?php echo JURI::base()?>components/com_osservicesbooking/asset/images/unpublish.png" />
+									<!--<td width="10%" style="text-align:center;">
+										<a href="javascript:removeService(<?php //echo $item->id?>,<?php //echo $row->id?>);" title="<?php //echo JText::_('OS_REMOVE_ORDER_ITEM');?>">
+											<img src="<?php //echo JURI::base()?>components/com_osservicesbooking/asset/images/unpublish.png" />
 										</a>
-									</td>
+									</td>-->
 								</tr>
 							<?php }
                             }

@@ -29,71 +29,83 @@ class HTML_OsAppscheduleForm{
 		?>
 		<div class="row-fluid">
 			<div class="span12">
-				<?php if(($configClass['using_cart'] == 1) or !OSBHelper::isTheSameDate($lists['date_from'],$lists['date_to'])){
-				$secondDiv = "span8";
+				<?php
+				$secondDiv = "span12";
+
+				//if($configClass['employee_booking_only_today'] == 0):
 				?>
-				<div class="span4" id="calendardivleft">
-					<?php if((!OSBHelper::isTheSameDate($lists['date_from'],$lists['date_to'])) and ($configClass['show_calendar_box'] == 1)){?>
-					<div class="row-fluid">
-						<div class="span12">
-							<?php
-								HelperOSappscheduleCalendar::initCalendarForSeveralYear(intval(date("Y",HelperOSappscheduleCommon::getRealTime())),$lists['category'],$lists['employee_id'],$lists['vid'],$lists['date_from'],$lists['date_to']);
-								?>
-								<input type="hidden" name="ossmh" id="ossmh" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>">
-								<input type="hidden" name="ossyh" id="ossyh" value="<?php echo intval(date("Y",HelperOSappscheduleCommon::getRealTime()))?>">
-						</div>
-					</div>
-					<div class="clearfix" style="height:10px;"></div>
-					<?php }
-					if(($configClass['using_cart'] == 1) and ($deviceType != "mobile")){
+
+				<?php 
+				if(($configClass['using_cart'] == 1) or !OSBHelper::isTheSameDate($lists['date_from'],$lists['date_to'])){
+					$secondDiv = "span8";
 					?>
-					<div class="row-fluid">
-						<div class="span12">
-							<div class="row-fluid bookingformdiv">
-								<div class="span12 <?php echo $configClass['header_style']?>">
-									<?php
-									if($configClass['disable_payments'] == 1){
+					<?php if($configClass['employee_booking_only_today'] == 0): ?>
+					<div class="span4" id="calendardivleft">
+						<?php if((!OSBHelper::isTheSameDate($lists['date_from'],$lists['date_to'])) and ($configClass['show_calendar_box'] == 1)){?>
+							<div class="row-fluid">
+							<div class="span12">
+								<?php
+									HelperOSappscheduleCalendar::initCalendarForSeveralYear(intval(date("Y",HelperOSappscheduleCommon::getRealTime())),$lists['category'],$lists['employee_id'],$lists['vid'],$lists['date_from'],$lists['date_to']);
 									?>
-									<div style="float:left;margin-right:5px;">
-										<img src="<?php echo JURI::root()?>components/com_osservicesbooking/style/images/arttocart.png">
-									</div>
-									<div style="float:left;padding-top:4px;">
-										<?php echo JText::_('OS_CART')?>
-									</div>
-									<?php
-									}else{
-									?>
-									<div style="float:left;padding-top:4px;">
-										<?php echo JText::_('OS_BOOKING_INFO');?>
-									</div>
-									<?php
-									}
-									?>
-								</div>
-								<table  width="100%">
-									<tr>
-										<td width="100%" style="padding:5px;" valign="top">
-											<div id="cartdiv">
-												<?php
-												$userdata = $_COOKIE['userdata'];
-												OsAppscheduleAjax::cart($userdata,$lists['vid'],$lists['category'],$lists['employee_id'],$lists['date_from'],$lists['date_to']);
-												?>
-											</div>
-										</td>
-									</tr>
-								</table>
+									<input type="hidden" name="ossmh" id="ossmh" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>">
+									<input type="hidden" name="ossyh" id="ossyh" value="<?php echo intval(date("Y",HelperOSappscheduleCommon::getRealTime()))?>">
 							</div>
-							<div id="servicebox" style="display:none;">
-								
+							</div>
+							<div class="clearfix" style="height:10px;"></div>
+						<?php }
+						if(($configClass['using_cart'] == 1) and ($deviceType != "mobile")){
+						?>
+						<div class="row-fluid">
+							<div class="span12">
+								<div class="row-fluid bookingformdiv">
+									<div class="span12 <?php echo $configClass['header_style']?>">
+										<?php
+										if($configClass['disable_payments'] == 1){
+										?>
+										<div style="float:left;margin-right:5px;">
+											<img src="<?php echo JURI::root()?>components/com_osservicesbooking/style/images/arttocart.png">
+										</div>
+										<div style="float:left;padding-top:4px;">
+											<?php echo JText::_('OS_CART')?>
+										</div>
+										<?php
+										}else{
+										?>
+										<div style="float:left;padding-top:4px;">
+											<?php echo JText::_('OS_BOOKING_INFO');?>
+										</div>
+										<?php
+										}
+										?>
+									</div>
+									<table  width="100%">
+										<tr>
+											<td width="100%" style="padding:5px;" valign="top">
+												<div id="cartdiv">
+													<?php
+													$userdata = $_COOKIE['userdata'];
+													OsAppscheduleAjax::cart($userdata,$lists['vid'],$lists['category'],$lists['employee_id'],$lists['date_from'],$lists['date_to']);
+													?>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+								<div id="servicebox" style="display:none;">
+									
+								</div>
 							</div>
 						</div>
+						<?php } ?>
+						<div class="clearfix"></div>
 					</div>
-					<?php } ?>
-					<div class="clearfix"></div>
-				</div>
-				<?php }else{
+					<?php endif;
+				}
+				else
+				{
 					$secondDiv = "span12";
 				}
+				//endif;
 				?>
 				<div class="<?php echo $secondDiv;?>" id="maindivright">
 					<div id="maincontentdiv">
@@ -108,12 +120,13 @@ class HTML_OsAppscheduleForm{
 					</div>
 				</div>
 			</div>
+
 			<div class="clearfix"></div>
 			<?php
 			if(($configClass['using_cart'] == 1) and ($deviceType == "mobile")){
 			?>
-			<div class="clearfix" style="height:10px;"></div>
-			<div class="row-fluid">
+				<div class="clearfix" style="height:10px;"></div>
+				<div class="row-fluid">
 				<div class="span12">
 					<div class="row-fluid bookingformdiv">
 						<div class="span12 <?php echo $configClass['header_style']?>">
@@ -153,7 +166,7 @@ class HTML_OsAppscheduleForm{
 						
 					</div>
 				</div>
-			</div>
+				</div>
 			<?php }
 			if($configClass['show_footer'] == 1){
 				if($configClass['footer_content'] != ""){
@@ -168,12 +181,40 @@ class HTML_OsAppscheduleForm{
 		</div>
 		<input type="hidden" name="option" value="com_osservicesbooking" /> 
 		<input type="hidden" name="task" value="" />
-		<input type="hidden" name="month"  id="month" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>" />
+    
+    
+	 <?php
+   if($configClass['employee_booking_only_today'] == 1){
+      	$hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+      	$today_desface = new DateTime();
+      	$today_desface->modify("+{$hours_desface} hours");
+    
+      	$desface_month 	= $today_desface->format('m');
+	    $desface_year		= $today_desface->format('Y');
+		$desface_date		= $today_desface->format('d');?>
+    	<input type="hidden" name="month"  id="month" value="<?php echo $desface_month; ?>" />
+		<input type="hidden" name="year"  id="year" value="<?php echo $desface_year; ?>" />
+		<input type="hidden" name="day"  id="day" value="<?php echo $desface_date;?>" />
+    
+    	<input type="hidden" name="select_day" id="select_day" value="<?php echo $desface_date;?>" />
+		<input type="hidden" name="select_month" id="select_month" value="<?php echo $desface_month;?>" />
+		<input type="hidden" name="select_year" id="select_year" value="<?php echo $desface_year;?>" />
+    <?php
+    }
+    else
+    {
+    ?>
+    	<input type="hidden" name="month"  id="month" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>" />
 		<input type="hidden" name="year"  id="year" value="<?php echo date("Y",HelperOSappscheduleCommon::getRealTime())?>" />
 		<input type="hidden" name="day"  id="day" value="<?php echo intval(date("d",HelperOSappscheduleCommon::getRealTime()));?>" />
-		<input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
+    	<input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
 		<input type="hidden" name="select_month" id="select_month" value="<?php echo $month;?>" />
 		<input type="hidden" name="select_year" id="select_year" value="<?php echo $year;?>" />
+    <?php
+    }
+    ?>	
+  
+  	
 		<input type="hidden" name="live_site" id="live_site" value="<?php echo JURI::root()?>"  />
 		<input type="hidden" name="order_id" id="order_id" value="" />
 		<input type="hidden" name="current_date" id="current_date" value=""  />
@@ -273,6 +314,7 @@ class HTML_OsAppscheduleForm{
 		?>
 		<div class="row-fluid bookingformdiv">
 			<div class="span12 <?php echo $configClass['header_style']?>">
+			
 				<?php echo JText::_('OS_BOOKING_FORM')?>
 				<?php
 				if($configClass['show_calendar_box'] == 1){
@@ -604,8 +646,13 @@ class HTML_OsAppscheduleForm{
 					}
 					if(OsAppscheduleAjax::isAnyItemsInCart()){
 					?>
-					<div class="span12">
-						<input type="button" id="confirmSubmit" class="btn btn-success" value="<?php echo JText::_('OS_CONFIRM')?>">
+					<div class="row">
+						<div class="span6">
+							<input type="button" id="confirmSubmit" class="btn btn-success" value="<?php echo JText::_('OS_CONFIRM')?>">
+						</div>
+						<div class="span6">
+							<input type="button" id="cancelSubmit" class="btn btn-cancel" value="<?php echo JText::_('OS_CANCEL')?>">
+						</div>
 					</div>
 					<?php } ?>
 				</div>
@@ -652,7 +699,7 @@ class HTML_OsAppscheduleForm{
 		}
 		?>
 		<input type="hidden" name="option" value="com_osservicesbooking" />
-		<input type="hidden" name="task" value="default_completeorder" />
+		<input type="hidden" name="task" id="task" value="default_completeorder" />
 		<input type="hidden" name="Itemid" value="<?php echo Jrequest::getVar('Itemid')?>"  />
 		</form>
 		<script language="javascript">
@@ -662,6 +709,17 @@ class HTML_OsAppscheduleForm{
             jQuery("#confirmSubmit").prop('disabled',true);
 			document.getElementById("bookingForm").submit();
         });
+
+		jQuery("#cancelSubmit").click(function()
+        {
+			jQuery("#cancelSubmit").attr('disabled','disabled');
+            jQuery("#cancelSubmit").prop('disabled',true);
+
+            jQuery("#task").val("default_cancelbooking");
+            
+			document.getElementById("bookingForm").submit();
+        });
+
 		function addtoCart(sid,eid,time_length){
 			var form			= document.appform;
 			var bookitem		= document.getElementById('book_' + sid +  '_' + eid);
@@ -961,110 +1019,128 @@ class HTML_OsAppscheduleForm{
 					<?php
 					}
 					?>
+
 					<div class="row-fluid">
 						<div class="clearfix"></div>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<div class="span3 boldtext">
 							<?php echo JText::_('OS_NAME')." (*)";?>
 						</div>
+						<?php endif;?>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<div class="span8">
 							<input type="text" class="input-large" size="20" name="order_name" id="order_name" value="<?php echo $name?>" />
 						</div>
+						<?php else : ?>
+							<input type="hidden" class="input-large" size="20" name="order_name" id="order_name" value="<?php echo $name?>" />
+						<?php endif; ?>
+
 						<div class="clearfix"></div>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<div class="span3 boldtext">
 							<?php echo JText::_('OS_EMAIL')." (*)";?>
 						</div>
+						<?php endif;?>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<div class="span8">
 							<input type="text" class="input-large" value="<?php echo $email?>" size="20" name="order_email" id="order_email" />
 						</div>
-						<?php
-						if($configClass['value_sch_include_phone']){
-						?>
-						
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_PHONE')?>
-								<?php
-								if($configClass['value_sch_include_phone'] == 2){
-									echo "(*)";
-								}
-								?>
-							</div>
-							<div class="span8">
-								<?php
-								if($configClass['clickatell_showcodelist'] == 1){
-								?>
-								<?php echo $lists['dial']?>
-								<?php
-								}
-								?>
-								
-								<input type="text" class="input-small" value="<?php echo $profile->order_phone;?>" size="10" name="order_phone" id="order_phone" />
-								<input type="hidden" value="<?php echo $configClass['value_sch_include_phone'];?>" name="order_phone_required" id="order_phone_required" />
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						if($configClass['value_sch_include_country']){
-						?>
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_COUNTRY')?>
-							</div>
-							<div class="span8">
-								<?php echo $lists['country'];?>
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						if($configClass['value_sch_include_address']){
-						?>
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_ADDRESS')?>
-								<?php
-								if($configClass['value_sch_include_address'] == 2){
-									echo "(*)";
-								}
-								?>
-							</div>
-							<div class="span8">
-								<input type="text" class="input-large" value="<?php echo $profile->order_address;?>" size="20" name="order_address" id="order_address" />
-								<input type="hidden" value="<?php echo $configClass['value_sch_include_address'];?>" name="order_address_required" id="order_address_required" />
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						if($configClass['value_sch_include_city']){
-						?>
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_CITY')?>
-							</div>
-							<div class="span8">
-								<input type="text" class="input-small" value="<?php echo $profile->order_city;?>" size="20" name="order_city" id="order_city" />
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						if($configClass['value_sch_include_state']){
-						?>
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_STATE')?>
-							</div>
-							<div class="span8">
-									<input type="text" class="input-small" value="<?php echo $profile->order_state;?>" size="10" name="order_state" id="order_state" />
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						if($configClass['value_sch_include_zip']){
-						?>
-							<div class="span3 boldtext">
-								<?php echo JText::_('OS_ZIP')?>
-							</div>
-							<div class="span8">
-								<input type="text" class="input-small" value="<?php echo $profile->order_zip;?>" size="10" name="order_zip" id="order_zip" />
-							</div>
-							<div class="clearfix"></div>
-						<?php
-						}
-						?>
+						<?php else: ?>
+							<input type="hidden" class="input-large" value="<?php echo $email?>" size="20" name="order_email" id="order_email" />
+						<?php endif;?>
+
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
+							<?php
+							if($configClass['value_sch_include_phone']){
+							?>
+							
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_PHONE')?>
+									<?php
+									if($configClass['value_sch_include_phone'] == 2){
+										echo "(*)";
+									}
+									?>
+								</div>
+								<div class="span8">
+									<?php
+									if($configClass['clickatell_showcodelist'] == 1){
+									?>
+									<?php echo $lists['dial']?>
+									<?php
+									}
+									?>
+									
+									<input type="text" class="input-small" value="<?php echo $profile->order_phone;?>" size="10" name="order_phone" id="order_phone" />
+									<input type="hidden" value="<?php echo $configClass['value_sch_include_phone'];?>" name="order_phone_required" id="order_phone_required" />
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							if($configClass['value_sch_include_country']){
+							?>
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_COUNTRY')?>
+								</div>
+								<div class="span8">
+									<?php echo $lists['country'];?>
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							if($configClass['value_sch_include_address']){
+							?>
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_ADDRESS')?>
+									<?php
+									if($configClass['value_sch_include_address'] == 2){
+										echo "(*)";
+									}
+									?>
+								</div>
+								<div class="span8">
+									<input type="text" class="input-large" value="<?php echo $profile->order_address;?>" size="20" name="order_address" id="order_address" />
+									<input type="hidden" value="<?php echo $configClass['value_sch_include_address'];?>" name="order_address_required" id="order_address_required" />
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							if($configClass['value_sch_include_city']){
+							?>
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_CITY')?>
+								</div>
+								<div class="span8">
+									<input type="text" class="input-small" value="<?php echo $profile->order_city;?>" size="20" name="order_city" id="order_city" />
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							if($configClass['value_sch_include_state']){
+							?>
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_STATE')?>
+								</div>
+								<div class="span8">
+										<input type="text" class="input-small" value="<?php echo $profile->order_state;?>" size="10" name="order_state" id="order_state" />
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							if($configClass['value_sch_include_zip']){
+							?>
+								<div class="span3 boldtext">
+									<?php echo JText::_('OS_ZIP')?>
+								</div>
+								<div class="span8">
+									<input type="text" class="input-small" value="<?php echo $profile->order_zip;?>" size="10" name="order_zip" id="order_zip" />
+								</div>
+								<div class="clearfix"></div>
+							<?php
+							}
+							?>
+						<?php endif;?>
+
 						<?php
 						$fieldArr = array();
 						$commercial_ids = array();
@@ -1090,13 +1166,16 @@ class HTML_OsAppscheduleForm{
 							<?php
 						}
 						?>
+
 						<input type="hidden" name="commercial_ids" id="commercial_ids" value="<?php echo implode(",",$commercial_ids)?>" />
-						<div class="span3 boldtext">
-							<?php echo JText::_('OS_NOTES')?>
-						</div>
-						<div class="span8">
-							<textarea name="notes" id="notes" cols="40" rows="4" class="inputbox"></textarea>
-						</div>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
+							<div class="span3 boldtext">
+								<?php echo JText::_('OS_NOTES')?>
+							</div>
+							<div class="span8">
+								<textarea name="notes" id="notes" cols="40" rows="4" class="inputbox"></textarea>
+							</div>
+						<?php endif;?>
 						<div class="clearfix"></div>
 						<?php
 						if(OSBHelper::checkCouponAvailable()){
@@ -1305,9 +1384,11 @@ class HTML_OsAppscheduleForm{
 						}
 						if(OsAppscheduleAjax::isAnyItemsInCart()){
 						?>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<div class="span12" style="text-align:center;">
 							<input type="button" class="btn btn-success" value="<?php echo JText::_('OS_SUBMIT')?>" onclick="javascript:confirmBooking()">
 						</div>
+						<?php endif; ?>
 						<?php } ?>
 					</div>
 					<input type="hidden" name="fields" id="fields" value="" />
@@ -1412,7 +1493,7 @@ class HTML_OsAppscheduleForm{
 				var answer = 1;
 				<?php } ?>
 				var end_booking_time = parseInt(bookitem.value) + parseInt(time_length);
-				if(answer == 1){
+				if(answe+r == 1){
 					var live_site = document.getElementById('live_site');
 					var x = document.getElementsByName("addtocartbtn");
 					var i;
@@ -1442,9 +1523,13 @@ class HTML_OsAppscheduleForm{
 			var field_ids				= 	document.getElementById('field_ids');
 			var notes		 			= 	document.getElementById('notes');
 			var enable_termandcondition = document.getElementById('enable_termandcondition');
-			notes						= 	notes.value;
-			notes						= 	notes.replace("&","(@)");
-			notes						= 	notes.replace("\"","'");
+			if(notes != null){
+				notes						= 	notes.value;
+				notes						= 	notes.replace("&","(@)");
+				notes						= 	notes.replace("\"","'");
+			}
+			else
+				notes = "";
 
 			var commercial_ids			= document.getElementById('commercial_ids');
 			commercial_ids				= commercial_ids.value;
@@ -1632,29 +1717,33 @@ class HTML_OsAppscheduleForm{
 			}else{
 				order_zip				= "";
 			}
-			
 			var check_captcha			= 0;
 			var captcha_pass			= 0;
-			if(use_captcha.value == "2"){
-				check_captcha			= 1;
-				var security_code		=   document.getElementById('security_code');
-				if(security_code.value == ""){
-					captcha_pass		= 0;
-				}else if(security_code.value != resultStr.value){
-					captcha_pass		= 0;
-				}else{
-					captcha_pass		= 1;
+			if(use_captcha != null){
+				if(use_captcha.value == "2"){
+					check_captcha			= 1;
+					var security_code		=   document.getElementById('security_code');
+					if(security_code.value == ""){
+						captcha_pass		= 0;
+					}else if(security_code.value != resultStr.value){
+						captcha_pass		= 0;
+					}else{
+						captcha_pass		= 1;
+					}
 				}
 			}
 			
 			var pass_term = 1;
-			if(enable_termandcondition.value == 1){
-				var term_and_condition	= document.getElementById('term_and_condition');
-                if(! document.getElementById('term_and_condition').checked){
-                    pass_term = 0;
-                }
+			if(enable_termandcondition != null){
+				if(enable_termandcondition.value == 1){
+					var term_and_condition	= document.getElementById('term_and_condition');
+	                if(! document.getElementById('term_and_condition').checked){
+	                    pass_term = 0;
+	                }
+				}
 			}
-			
+		
+
 			if(methodpass == 1){
 				if((check_captcha == 1) && (captcha_pass == 0)){
 					var security_code   =   document.getElementById('security_code');
@@ -1696,6 +1785,33 @@ class HTML_OsAppscheduleForm{
 		}
 		</script>
 		<?php
+		if($configClass['employee_booking_only_today'] == 1): 
+		?>	
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+		<div class="progress">
+		    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+		</div>
+		<script type="text/javascript">
+
+			var $progress = $('.progress');
+			var $progressBar = $('.progress-bar');
+			var $alert = $('.alert');
+
+			setTimeout(function() {
+			    $progressBar.css('width', '10%');
+			    setTimeout(function() {
+			        $progressBar.css('width', '30%');
+			        setTimeout(function() {
+			            $progressBar.css('width', '100%');
+			            setTimeout(function() {
+			                confirmBooking();
+			            }, 500); // WAIT 5 milliseconds
+			        }, 200); // WAIT 2 seconds
+			    }, 100); // WAIT 1 seconds
+			}, 100); // WAIT 1 second
+		</script>
+		<?php endif;
 	}
 	
 	function checkoutLayout($lists,$fields,$profile){
@@ -1707,6 +1823,11 @@ class HTML_OsAppscheduleForm{
 		
 		<div class="row-fluid">
 			<div class="span12">
+				<?php
+				$secondDiv = "span12";
+
+				if($configClass['employee_booking_only_today'] == 0):
+				?>
 				<?php if(($configClass['using_cart'] == 1) or !OSBHelper::isTheSameDate($lists['date_from'],$lists['date_to'])){
 				$secondDiv = "span8";
 				?>
@@ -1772,6 +1893,7 @@ class HTML_OsAppscheduleForm{
 				<?php }else{
 					$secondDiv = "span12";
 				}
+				endif;
 				?>
 				<div class="<?php echo $secondDiv;?>" id="maindivright">
 					<div id="maincontentdiv">

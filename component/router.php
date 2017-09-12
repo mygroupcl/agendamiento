@@ -191,6 +191,21 @@ function osservicesbookingBuildRoute(&$query)
 				unset($query['Itemid']);
 			}
 		break;
+
+		case "default_information":
+			$segments[] = JText::_('OS_MY_WORKKING_LIST');
+			$segments[] = $query['tmpl'];
+			$segments[] = $query['sid'];
+			$segments[] = $query['lang'];
+			if(isset($query['uid']) and ($query['uid'] > 0)){
+				$segments[] = $query['uid'];
+				unset($query['uid']);
+			}
+
+			unset($query['lang']);
+			unset($query['sid']);
+			unset($query['tmpl']);
+		break;
 	}
 	
 	if (isset($query['start']) || isset($query['limitstart']))

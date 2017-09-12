@@ -308,6 +308,7 @@ function ajax1() {
 			}
 		}else{
 			document.getElementById("cartdiv").innerHTML = str2 ;
+			console.log("reserva hecha...");
 		}
 		var selected_item = document.getElementById('selected_item');
 		//var div = document.getElementById(selected_item.value);

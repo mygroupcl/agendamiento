@@ -150,13 +150,27 @@ class OsAppscheduleAjax{
 		//$db->setQuery("DELETE FROM #__app_sch_temp_temp_order_items WHERE unique_cookie LIKE '$unique_cookie'");
 		//$db->query();
 		HelperOSappscheduleCommon::removeTempSlots();
+		//fix
+		if($configClass['employee_booking_only_today'] == 1){
+			$config = new JConfig();
+    		$offset = $config->offset;
+   			$hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+	      	$today_desface = new DateTime();
+	      	$today_desface->modify("+{$hours_desface} hours");
+	    
+	      	$month 	= $today_desface->format('m');
+		  	$year		= $today_desface->format('Y');
+		  	$day		= $today_desface->format('d');
+		}
+
 		//check to see if this day is off
-		if(intval($month) < 10){
+		if(intval($month) < 10 && strlen($month) == 1){
 			$month = "0".$month;
 		}
-		if(intval($day) < 10){
-			$day = "0".$day;
+		if(intval($day) < 10 && strlen($day) == 1){
+			$day = "ft0".$day;
 		}
+
 		$date = $year."-".$month."-".$day;
 		$date_int = strtotime($date);
 		$date_we  = date("N",$date_int);
@@ -286,6 +300,7 @@ class OsAppscheduleAjax{
 		global $mainframe,$configClass;
 		$realtime 				= HelperOSappscheduleCommon::getRealTime();
 		$db = JFactory::getDbo();
+
 		$update_temp_table		= Jrequest::getVar('update_temp_table',0);
 		$start_booking_time 	= JRequest::getVar('start_booking_time','');
 		//echo date("H:i",$start_booking_time);
@@ -307,13 +322,29 @@ class OsAppscheduleAjax{
 		$unique_cookie 			= OSBHelper::getUniqueCookie();//$_COOKIE['unique_cookie'];
 		$repeat					= Jrequest::getVar('repeat','');
 		$nslots 				= Jrequest::getVar('nslots',0);
+
+
+		//check if order already a item
+		//remember that a order can has only one item
+		$db->setQuery("SELECT COUNT(o.id) FROM #__app_sch_temp_orders o INNER JOIN konas_app_sch_temp_order_items oi where o.unique_cookie like '$unique_cookie'");
+		$items = $db->loadResult();
+		
+		/*if($items >= 1){
+			JError::raiseWarning( 100, 'Order can have only one item. You must complete this order before select another bokking' );
+       		return false;
+		}*/
+
+
 		$config = new JConfig();
 		$offset = $config->offset;
 		date_default_timezone_set($offset);
+
 		if($update_temp_table == 1){
+			
 			$additional_information	= $_GET['additional_information'];
 			$extraFields = explode("@",$additional_information);
 			$bookingData = array();
+
 			if($repeat != ""){ //prepare data for the repeat booking
 				$repeatArr = explode("|",$repeat);
 				$repeat_type  = $repeatArr[0];
@@ -358,10 +389,6 @@ class OsAppscheduleAjax{
 					
 					$book_start_booking_date = $book->start_time;
 					$book_end_booking_time   = $book->end_time;
-					
-					//convert to GMT timezone
-					//date_default_timezone_set('UTC');
-					//$local_time = date("Y-m-d H:i:s", time());
 					
 					$temp_start_min 		 = intval(date("i",$book_start_booking_date));
 					$temp_start_hour  		 = intval(date("H",$book_start_booking_date));
@@ -412,6 +439,7 @@ class OsAppscheduleAjax{
 				
 				$db->setQuery("Select * from #__app_sch_temp_temp_order_items where unique_cookie like '$unique_cookie'");
 				$rows = $db->loadObjectList();
+
 				if(count($rows) > 0){
 					$errorArr = array();
 					for($i=0;$i<count($rows);$i++){
@@ -1325,9 +1353,9 @@ class OsAppscheduleAjax{
 							?>
 						</td>
 						<td width="10%" align="center" style="border-bottom:1px solid #D0C5C5 !important;">
-							<a href="javascript:removeItem(<?php echo $sid?>,<?php echo $start_booking_date?>,<?php echo $end_booking_date?>,<?php echo $eid?>);" title="Remove item" class="applink">
-								<img src="<?php echo JURI::root()?>components/com_osservicesbooking/style/images/icon-16-deny.png" border="0">
-							</a>
+							<!--<a href="javascript:removeItem(<?php /*echo $sid*/?>,<?php /*echo $start_booking_date*/?>,<?php /*echo $end_booking_date*/?>,<?php /*echo $eid*/?>);" title="Remove item" class="applink">
+								<img src="<?php /*echo JURI::root()*/?>components/com_osservicesbooking/style/images/icon-16-deny.png" border="0">
+							</a>-->
 						</td>
 					</tr>
 					<tr>

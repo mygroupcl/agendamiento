@@ -487,6 +487,15 @@ class OSappscheduleConfiguration{
 		}
 		$lists['show_booked_information'] = JHTML::_('select.genericlist', $options, 'show_booked_information', ' class="input-small" ', 'value', 'text', $configs->show_booked_information);
 		
+ 	  $options = array() ;
+		$options[] = JHTML::_('select.option', 1, JText::_('OS_CONFIGURATION_YES'));
+		$options[] = JHTML::_('select.option', 0, JText::_('OS_CONFIGURATION_NO'));
+		if($configs->show_booked_information == ""){
+			$configs->show_booked_information = 1;
+		}
+		$lists['employee_booking_only_today'] = JHTML::_('select.genericlist', $options, 'employee_booking_only_today', ' class="input-small" ', 'value', 'text', $configs->employee_booking_only_today);
+	
+    
 		$options = array() ;
 		$options[] = JHTML::_('select.option', 1, JText::_('OS_CONFIGURATION_YES'));
 		$options[] = JHTML::_('select.option', 0, JText::_('OS_CONFIGURATION_NO'));

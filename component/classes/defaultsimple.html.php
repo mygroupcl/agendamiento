@@ -210,12 +210,42 @@ class HTML_OsAppscheduleDefaultSimple{
 		</div>
 		<input type="hidden" name="option" value="com_osservicesbooking"  />
 		<input type="hidden" name="task" value="">
-		<input type="hidden" name="month"  id="month" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>" />
+    
+    <?php
+    if($configClass['employee_booking_only_today'] == 1){
+      $hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+      $today_desface = new DateTime();
+      $today_desface->modify("+{$hours_desface} hours");
+    
+      $desface_month 	= $today_desface->format('m');
+	    $desface_year		= $today_desface->format('Y');
+		  $desface_date		= $today_desface->format('d');
+      
+    ?>
+    <input type="hidden" name="month"  id="month" value="<?php echo $desface_month; ?>" />
+		<input type="hidden" name="year"  id="year" value="<?php echo $desface_year; ?>" />
+		<input type="hidden" name="day"  id="day" value="<?php echo $desface_date;?>" />
+    
+    <input type="hidden" name="select_month"  id="select_month" value="<?php echo $desface_month; ?>" />
+		<input type="hidden" name="select_year"  id="select_year" value="<?php echo $desface_year; ?>" />
+		<input type="hidden" name="select_day"  id="select_day" value="<?php echo $desface_date;?>" />
+    <?php
+    }
+    else
+    {
+    ?>
+    <input type="hidden" name="month"  id="month" value="<?php echo intval(date("m",HelperOSappscheduleCommon::getRealTime()))?>" />
 		<input type="hidden" name="year"  id="year" value="<?php echo date("Y",HelperOSappscheduleCommon::getRealTime())?>" />
 		<input type="hidden" name="day"  id="day" value="<?php echo intval(date("d",HelperOSappscheduleCommon::getRealTime()));?>" />
-		<input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
+    
+    <input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
 		<input type="hidden" name="select_month" id="select_month" value="<?php echo $month;?>" />
 		<input type="hidden" name="select_year" id="select_year" value="<?php echo $year;?>" />
+    <?php
+    }
+    ?>
+    
+		
 		<input type="hidden" name="live_site" id="live_site" value="<?php echo JURI::root()?>"  />
 		<input type="hidden" name="order_id" id="order_id" value="" />
 		<input type="hidden" name="current_date" id="current_date" value=""  />

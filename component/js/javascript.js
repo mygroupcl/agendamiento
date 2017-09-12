@@ -493,15 +493,24 @@ function openOtherInformation(id,text){
 	}
 }
 
-function removeOrder(id,msg,live_site,itemid){
+function removeOrder(id,msg,live_site,itemid, md5){
 	var answer = confirm(msg);
 	if(answer == 1){
-		location.href = live_site + "index.php?option=com_osservicesbooking&task=default_removeorder&id=" + id + "&Itemid=" + itemid;
+		location.href = "index.php?option=com_osservicesbooking&task=default_cancelorder&id=" + id + "&ref=" + md5;
+		//location.href = live_site + "index.php?option=com_osservicesbooking&task=default_removeorder&id=" + id + "&Itemid=" + itemid;
 	}
 }
 
 
 function removeOrderItem(order_id,id,msg,live_site,itemid){
+	var answer = confirm(msg);
+	if(answer == 1){
+		document.getElementById('oid').value = order_id;
+		removeOrderItemAjax(order_id,id,live_site);
+	}
+}
+
+function cancelOrderItem(order_id,id,msg,live_site,itemid){
 	var answer = confirm(msg);
 	if(answer == 1){
 		document.getElementById('oid').value = order_id;

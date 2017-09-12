@@ -105,28 +105,34 @@ class HTML_OsAppscheduleDefault{
 			?>
 			
 			<div class="row-fluid">
-				<?php if(($configClass['using_cart'] == 1) or (!OSBHelper::isTheSameDate($date_from,$date_to))){
-				$secondDiv = "span8";
+				<?php
+				$secondDiv = "span12";
+
+				if($configClass['employee_booking_only_today'] == 0):
 				?>
-				<div class="span4" id="calendardivleft" class="hidden-phone">
-					<?php if(!OSBHelper::isTheSameDate($date_from,$date_to)){?>
-					<div class="row-fluid">
-						<div class="span12">
-							<?php
-							HelperOSappscheduleCalendar::initCalendarForSeveralYear(intval(date("Y",HelperOSappscheduleCommon::getRealTime())),$category->id,$employee_id,$vid,$date_from,$date_to);
-							?>
-							<input type="hidden" name="ossmh" id="ossmh" value="<?php echo $month; ?>" />
-							<input type="hidden" name="ossyh" id="ossyh" value="<?php echo $year; ?>" />
-						</div>
-					</div>
-					<?php }
-					if(($configClass['using_cart'] == 1) and ($deviceType != "mobile")){
+					<?php if(($configClass['using_cart'] == 1) or (!OSBHelper::isTheSameDate($date_from,$date_to))){
+					$secondDiv = "span8";
 					?>
-					<div class="clearfix" style="height:10px;"></div>
-					<div class="row-fluid">
-						<div class="span12">
-							<div class="row-fluid bookingformdiv">
-								<div class="span12 <?php echo $configClass['header_style']?>">
+
+					<div class="span4" id="calendardivleft" class="hidden-phone">
+						<?php if(!OSBHelper::isTheSameDate($date_from,$date_to)){?>
+						<div class="row-fluid">
+							<div class="span12">
+								<?php
+								HelperOSappscheduleCalendar::initCalendarForSeveralYear(intval(date("Y",HelperOSappscheduleCommon::getRealTime())),$category->id,$employee_id,$vid,$date_from,$date_to);
+								?>
+								<input type="hidden" name="ossmh" id="ossmh" value="<?php echo $month; ?>" />
+								<input type="hidden" name="ossyh" id="ossyh" value="<?php echo $year; ?>" />
+							</div>
+						</div>
+						<?php }
+						if(($configClass['using_cart'] == 1) and ($deviceType != "mobile")){
+						?>
+						<div class="clearfix" style="height:10px;"></div>
+						<div class="row-fluid">
+							<div class="span12">
+								<div class="row-fluid bookingformdiv">
+									<div class="span12 <?php echo $configClass['header_style']?>">
 									<?php
 									if($configClass['disable_payments'] == 1){
 									?>
@@ -145,8 +151,8 @@ class HTML_OsAppscheduleDefault{
 									<?php
 									}
 									?>
-								</div>
-								<table  width="100%">
+									</div>
+									<table  width="100%">
 									<tr>
 										<td width="100%" style="padding:5px;" valign="top">
 											<div id="cartdiv">
@@ -157,19 +163,20 @@ class HTML_OsAppscheduleDefault{
 											</div>
 										</td>
 									</tr>
-								</table>
-							</div>
-							<div id="servicebox" style="display:none;">
-								
+									</table>
+								</div>
+								<div id="servicebox" style="display:none;">
+									
+								</div>
 							</div>
 						</div>
+						<?php } ?>
+						<div class="clearfix"></div>
 					</div>
-					<?php } ?>
-					<div class="clearfix"></div>
-				</div>
-				<?php }else{
-					$secondDiv = "span12";
-				}
+					<?php }else{
+						$secondDiv = "span12";
+					}
+				endif;
 				?>
 				<div class="<?php echo $secondDiv;?>" id="maindivright">
 					<div id="maincontentdiv">
@@ -239,12 +246,41 @@ class HTML_OsAppscheduleDefault{
 		</div>
 		<input type="hidden" name="option" value="com_osservicesbooking"  />
 		<input type="hidden" name="task" value="">
-		<input type="hidden" name="month"  id="month" value="<?php echo $month; ?>" />
+    
+    <?php
+    if($configClass['employee_booking_only_today'] == 1){
+      $hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+      $today_desface = new DateTime();
+      $today_desface->modify("+{$hours_desface} hours");
+    
+      $desface_month 	= $today_desface->format('m');
+	  $desface_year		= $today_desface->format('Y');
+	  $desface_date		= $today_desface->format('d');
+      
+    ?>
+    <input type="hidden" name="month"  id="month" value="<?php echo $desface_month; ?>" />
+		<input type="hidden" name="year"  id="year" value="<?php echo $desface_year; ?>" />
+		<input type="hidden" name="day"  id="day" value="<?php echo $desface_date;?>" />
+    
+    <input type="hidden" name="select_month"  id="select_month" value="<?php echo $desface_month; ?>" />
+		<input type="hidden" name="select_year"  id="select_year" value="<?php echo $desface_year; ?>" />
+		<input type="hidden" name="select_day"  id="select_day" value="<?php echo $desface_date;?>" />
+    <?php
+    }
+    else
+    {
+    ?>
+    <input type="hidden" name="month"  id="month" value="<?php echo $month; ?>" />
 		<input type="hidden" name="year"  id="year" value="<?php echo $year; ?>" />
 		<input type="hidden" name="day"  id="day" value="<?php echo intval(date("d",HelperOSappscheduleCommon::getRealTime()));?>" />
-		<input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
+    
+    <input type="hidden" name="select_day" id="select_day" value="<?php echo $day;?>" />
 		<input type="hidden" name="select_month" id="select_month" value="<?php echo $month;?>" />
 		<input type="hidden" name="select_year" id="select_year" value="<?php echo $year;?>" />
+    <?php
+    }
+    ?>
+  
 		<input type="hidden" name="live_site" id="live_site" value="<?php echo JURI::root()?>"  />
 		<input type="hidden" name="order_id" id="order_id" value="" />
 		<input type="hidden" name="current_date" id="current_date" value=""  />
@@ -538,7 +574,7 @@ class HTML_OsAppscheduleDefault{
 							</td>
 							<?php if($configClass['allow_cancel_request'] == 1){?>
 								<td width="10%" class="osbtdheader">
-									<?php echo JText::_('OS_REMOVE_ORDER');?>
+									<?php echo JText::_('OS_CANCEL');?>
 								</td>
 							<?php }?>
 							<td width="3%" class="osbtdheader hidden-phone">
@@ -575,10 +611,11 @@ class HTML_OsAppscheduleDefault{
 									}elseif($row->order_status == "C"){
 										?>
 										<p class="text-success">
-											<?php echo JText::_('OS_CANCEL');?>
+											<?php echo JText::_('OS_CANCELED');?>
 										</p>
 										<?php
-									}else{
+									}
+									else{
 										?>
 										<p class="text-success">
 											<?php 
@@ -595,9 +632,11 @@ class HTML_OsAppscheduleDefault{
 								</td>
 								<?php if($configClass['allow_cancel_request'] == 1){?>
 									<td class="td_data" style="background-color:<?php echo $bgcolor?>;text-align:center;">
-										<a href="javascript:removeOrder(<?php echo $row->id?>,'<?php echo JText::_('OS_DO_YOU_WANT_T0_REMOVE_ORDER')?>','<?php echo JURI::root()?>','<?php echo Jrequest::getVar('Itemid',0);?>');" title="<?php echo JText::_('OS_CLICK_HERE_TO_REMOVE_ORDER_DETAILS');?>" />
+										<?php if($row->order_status != "C"){ ?>
+										<a href="javascript:removeOrder(<?php echo $row->id?>,'<?php echo JText::_('OS_DO_YOU_WANT_T0_REMOVE_ORDER')?>','<?php echo JURI::root()?>','<?php echo Jrequest::getVar('Itemid',0);?>','<?php echo md5($row->id)?>');" title="<?php echo JText::_('OS_CLICK_HERE_TO_REMOVE_ORDER_DETAILS');?>" />
 											<img src="<?php echo JURI::root()?>components/com_osservicesbooking/style/images/icon-16-deny.png" />
 										</a>
+										<?php } else echo "-" ?>
 									</td>
 								<?php }?>
 								<td class="td_data hidden-phone" style="background-color:<?php echo $bgcolor?>;text-align:center;">
@@ -650,6 +689,120 @@ class HTML_OsAppscheduleDefault{
 		</form>
 		<?php
 	}
+
+
+
+/**
+	 * List all orders Information
+	 *
+	 * @param unknown_type $orders
+	 */
+	function listBookingsInformation($rows){
+		global $mainframe,$configClass;
+		?>
+		<form method="POST" action="<?php echo JRoute::_('index.php?option=com_osservicesbooking&task=default_customer&Itemid='.JRequest::getVar('Itemid'))?>" name="ftForm">
+		<table width="100%" class="table table-stripped">
+			<?php
+			if(count($rows) > 0){
+			?>
+			<tr>
+				<td width="100%" style="padding-top:20px;"  colspan="2">
+					<table cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+							<td width="3%" class="osbtdheader hidden-phone">
+								#
+							</td>
+							<td width="15%" class="osbtdheader">
+								<?php echo JText::_('OS_SERVICE_NAME');?>
+							</td>
+							<td width="10%" class="osbtdheader">
+								<?php echo JText::_('OS_BOOKING_DATE');?>
+							</td>
+							<td width="10%" class="osbtdheader">
+								<?php echo JText::_('OS_FROM');?>
+							</td>
+							<td width="10%" class="osbtdheader">
+								<?php echo JText::_('OS_TO');?>
+							</td>
+							<td width="10%" class="osbtdheader">
+								<?php echo JText::_('OS_ORDER');?>
+							</td>
+							<td width="10%" class="osbtdheader">
+								<?php echo JText::_('OS_STATUS');?>
+							</td>
+						</tr>
+						<?php
+						for($i=0;$i<count($rows);$i++){
+							$row = $rows[$i];
+
+						$stime = date("H:i:s",$row->start_time);
+						$etime = date("H:i:s",$row->end_time);
+
+							if($i % 2 == 0){
+								$bgcolor = "#efefef";
+							}else{
+								$bgcolor = "#fff";
+							}
+							?>
+							<tr>
+								<td class="td_data hidden-phone" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo $i + 1;?>
+								</td>
+								<td class="td_data" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo $row->service_name?>
+								</td>
+								<td class="td_data" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo date($configClass['date_time_format'],strtotime($row->booking_date));?>
+								</td>
+								<td class="td_data" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo $stime;?>
+								</td>
+								<td class="td_data" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo $etime;?>
+								</td>
+								<td class="td_data" style="background-color:<?php echo $bgcolor?>;">
+									<?php echo $row->order_id?>
+								</td>
+								<td class="td_data" style="background-color: <?php echo $bgcolor?>;">
+										<?php echo OSBHelper::orderStatus(0,$row->order_status);?>
+								</td>
+							</tr>
+							<?php
+						}
+						?>
+					</table>
+				</td>
+			</tr>
+			<?php
+			}else{
+			?>
+			<tr>
+				<td width="100%" align="center" style="padding:20px;" colspan="2">
+					<strong><?php echo JText::_('OS_NO_BOOKING_REQUEST');?></strong>
+				</td>
+			</tr>
+			<?php
+			}
+			?>
+		</table>
+		<?php
+		if($configClass['footer_content'] != ""){
+			?>
+			<div class="osbfootercontent">
+				<?php echo $configClass['footer_content'];?>
+			</div>
+			<?php
+		}
+		?>
+		<input type="hidden" name="option" value="com_osservicesbooking"  />
+		<input type="hidden" name="task" value="default_customer" />
+		<input type="hidden" name="oid" id="oid" value="" />
+		<input type="hidden" name="Itemid" value="<?php echo JRequest::getVar('Itemid')?>" />
+		</form>
+		<?php
+	}
+
+
 	
 	function listEmployeeWorks($employee,$rows){
 		global $mainframe,$configClass;
@@ -1165,14 +1318,14 @@ class HTML_OsAppscheduleDefault{
 		$offset = $config->offset;
 		date_default_timezone_set($offset);
 		$db = JFactory::getDbo();
-		if(count($rows) > 0){
+		if(count($rows) > 0){	
 		?>
 		<div style="padding:5px;">
 		<table width="100%" class="table table-bordered" style="border:1px solid #efefef !important;">
 			<tr class="success">
 				<?php
                 if($checkin == 0) {
-                    if ($configClass['allow_cancel_request'] == 1) { ?>
+                    if (/*$configClass['allow_cancel_request'] == 1*/0) { ?>
                         <td width="10%" align="left" style="font-size:11px;color:gray;font-weight:bold;" class="hidden-phone">
                             <?php echo JText::_('OS_REMOVE') ?>
                         </td>
@@ -1211,10 +1364,10 @@ class HTML_OsAppscheduleDefault{
 				<tr>
 					<?php
                     if($checkin == 0) {
-                        if ($configClass['allow_cancel_request'] == 1) { ?>
+                        if (/*$configClass['allow_cancel_request'] == 1*/0) { ?>
                             <td class="hidden-phone" width="10%" align="left" style="font-size:11px;color:gray;">
-                                <a href="javascript:removeOrderItem(<?php echo $row->order_id ?>,<?php echo $row->order_item_id ?>,'<?php echo JText::_('OS_DO_YOU_WANT_T0_REMOVE_ORDER_ITEM') ?>','<?php echo JURI::root() ?>','<?php echo Jrequest::getVar('Itemid', 0); ?>');"
-                                   title="<?php echo JText::_('OS_CLICK_HERE_TO_REMOVE_ITEM'); ?>"/>
+                                <a href="javascript:cancelOrderItem(<?php echo $row->order_id ?>,<?php echo $row->order_item_id ?>,'<?php echo JText::_('OS_DO_YOU_WANT_T0_CANCEL_ORDER_ITEM') ?>','<?php echo JURI::root() ?>','<?php echo Jrequest::getVar('Itemid', 0); ?>');"
+                                   title="<?php echo JText::_('OS_CLICK_HERE_TO_CANCEL_THE_BOOKING_REQUEST'); ?>"/>
                                 <img
                                     src="<?php echo JURI::root() ?>components/com_osservicesbooking/style/images/icon-16-deny.png"/>
                                 </a>

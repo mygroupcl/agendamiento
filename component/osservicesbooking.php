@@ -14,17 +14,21 @@ defined('_JEXEC') or die;
 error_reporting(E_ERROR | E_PARSE | E_COMPILE_ERROR);
 define('DS',DIRECTORY_SEPARATOR);
 JTable::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR.DS.'tables');
+
 $document = JFactory::getDocument();
 $document->addScript(JURI::root()."components/com_osservicesbooking/js/ajax.js");
 $document->addScript(JURI::root()."components/com_osservicesbooking/js/paymentmethods.js");
 $document->addScript(JURI::root()."components/com_osservicesbooking/js/javascript.js");
 $document->addStyleSheet(JURI::root()."components/com_osservicesbooking/style/style.css");
+
 require_once JPATH_ROOT.'/components/com_osservicesbooking/plugins/os_payment.php';
 require_once JPATH_ROOT.'/components/com_osservicesbooking/plugins/os_payments.php';
 require_once JPATH_COMPONENT.DS."helpers".DS."pane.php";
 require_once JPATH_COMPONENT_ADMINISTRATOR.DS."helpers".DS."helper.php";
+
 jimport('joomla.html.parameter');
 jimport('joomla.filesystem.folder');
+
 //Include files from classes folder
 $dir = JFolder::files(JPATH_COMPONENT.DS."classes");
 if(count($dir) > 0){
@@ -209,6 +213,33 @@ if($task != ""){
 	//cpanel
 	$maintask = "";
 }
+
+
+if($task == "default_layout"){
+	$subscription_plans = HelperOSappscheduleSubscription::getActiveMembershipPlans();
+
+	$count = 0;
+	$pendingplan = 0;
+	foreach($subscription_plans as $i=>$subscription_plan){
+		if($subscription_plan->plan_subscription_status == 2 || $subscription_plan->plan_subscription_status ==5) continue;
+		if($subscription_plan->published == 0) {
+			$pendingplan++;
+			continue;
+		}
+	$count++;
+	}
+
+	if(!$count){
+		if($pendingplan > 0) {
+			$maintask = "pendingplan";
+		}
+		else {
+			$maintask = "noactiveplan";
+		}
+	}
+}
+
+
 switch ($maintask){
 	case "venue":
 		OsAppscheduleVenue::display($option,$task);
@@ -235,6 +266,23 @@ switch ($maintask){
 		}else{
 			OSappscheduleManage::display($option,$task);
 		}
+	break;
+	case "noactiveplan":
+	?>
+		<h2>
+			<?php echo JText::_('OS_NO_HAVE_ACTIVE_ORDERS')?>.
+		</h2>
+	<?php
+	break;
+	case "pendingplan":
+		?>
+		<h2>
+			<?php echo JText::_('OS_HAVE_PPENDIG_ORDERS')?>.
+		</h2>
+	<?php
+	break;
+	case "information":
+		OsAppscheduleCalendar::display($option,$task);
 	break;
 	default:
 		OsAppscheduleDefault::display($option,$task);

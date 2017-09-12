@@ -291,6 +291,22 @@ class HTML_OSappscheduleConfiguration{
 						</td>
 						<td ><?php echo $lists['employee_acl_group'] ?></td>
 					</tr>
+          <tr>
+						<td class="key">
+							<span class="editlinktip hasTip" title="<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY')?>::<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY_EXPLAIN')?>">
+								<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY')?>
+							</span>
+						</td>
+						<td ><?php echo $lists['employee_booking_only_today'] ?></td>
+					</tr>
+          <tr>
+						<td class="key">
+							<span class="editlinktip hasTip" title="<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY_DESFACE')?>::<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY_DESFACE_EXPLAIN')?>">
+								<?php echo JText::_('OS_EMPLOYEE_BOOKING_ONLY_TODAY_DESFACE')?>
+							</span>
+						</td>
+            <td ><input class="input-mini" type="text" size="4" name="employee_booking_only_today_desface" value="<?php echo $configs->employee_booking_only_today_desface?>"></td>
+					</tr>
 					<tr>
 						<td class="key">
 							<span class="editlinktip hasTip" title="<?php echo JText::_('Employee can change availability status')?>::<?php echo JText::_('Do you allow employee to change their availability status')?>">

@@ -762,11 +762,17 @@ class HTML_OsAppscheduleAjax{
 						    }						        			
 						}
 						?>
+						<?php if($configClass['employee_booking_only_today'] == 0): ?>
 						<tr>
 							<td colspan="2">
 								<input type="button" class="btn btn-primary" value="Submit" onclick="javascript:confirmBooking()">
 							</td>
 						</tr>
+						<?php else: ?>
+							<script type="text/javascript">
+								confirmBooking();
+							</script>>
+						<?php endif; ?>
 					</table>
 				</td>
 			</tr>
@@ -1067,7 +1073,10 @@ class HTML_OsAppscheduleAjax{
 						?>
 						<tr>
 							<td colspan="2">
-								<input type="button" class="btn btn-primary" value="Confirm" onclick="javascript:createBooking()">
+								<input type="button" class="btn btn-primary" value="<?php echo JText::_('OS_CONFIRM'); ?>" onclick="javascript:createBooking()">
+							</td>
+							<td colspan="2">
+								<input type="button" class="btn btn-delete" value="<?php echo JText::_('OS_CANCEL'); ?>" onclick="javascript:createBooking()">
 							</td>
 						</tr>
 					</table>

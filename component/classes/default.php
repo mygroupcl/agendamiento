@@ -100,6 +100,8 @@ class OsAppscheduleDefault{
 			break;
 			case "default_customer":
 				OsAppscheduleDefault::orderHistory();
+			case "default_information":
+				OsAppscheduleDefault::bookingInformation();
 			break;
 			case "default_removeorder":
 				OsAppscheduleDefault::removeOrder($order_id);
@@ -131,6 +133,9 @@ class OsAppscheduleDefault{
 			break;
             case "default_checkin":
                 OsAppscheduleDefault::checkIn();
+                break;
+            case "default_cancelbooking":
+            	OsAppscheduleDefault::cancelBooking();
                 break;
 		}
 	}
@@ -368,10 +373,11 @@ class OsAppscheduleDefault{
 			HelperOSappscheduleCommon::sendSMS('admin',$orderId);
 			HelperOSappscheduleCommon::updateAcyMailing($orderId);
 		}
-		
-		//update to Google Calendar
+	
+
 		include_once(JPATH_ADMINISTRATOR.DS."components".DS."com_osservicesbooking".DS."helpers".DS."helper.php");
 		OSBHelper::updateGoogleCalendar($orderId);
+		die;
 	}
 	
 	/**
@@ -621,7 +627,7 @@ class OsAppscheduleDefault{
 			$temp_order_id = $db->loadResult();
 			$db->setQuery("Select * from #__app_sch_temp_order_items where order_id = '$temp_order_id'");
 			$orders = $db->loadObjectList();
-			
+
 			if(count($orders) > 0){
 				for($i=0;$i<count($orders);$i++){
 					$orderdata = $orders[$i];
@@ -646,6 +652,63 @@ class OsAppscheduleDefault{
 							$db->query();
 						}
 					}
+
+					///hgarzo programming integration
+					///update to Google Calendar quotas in membership active
+					///First recovery user session and user order, are must be same user
+			    	///Then recovery active plans by user
+			    	///For every plan, get count of quote
+			    	///get quotas cosumed by user and compare
+					$quotas_qty = count($orders);
+			    	$subscription_plans = HelperOSappscheduleSubscription::getActiveMembershipPlans();			    	
+
+			    	foreach($subscription_plans as $i=>$subscription_plan){
+			    		if($subscription_plan->plan_subscription_status == 2 || $subscription_plan->plan_subscription_status ==5) continue;
+
+			    		//cupos disponibles por plan
+			    		$quotas_avaibles = $subscription_plan->subscription_quotas;
+			    		//cupos consumidos por usuario plan
+			    		$quotas_consumed = $subscription_plan->plan_subscription_quotas;
+			    		//id de susbcripcion
+			    		$subscription_id = $subscription_plan->active_subscription_id;
+			    		//remanider days
+			    		$remainder_quotas  = $subscription_plan->remainder_quotas;
+
+			    		//must be discount to current active plan
+			    		if(!(bool)$subscription_plan->lifetime_membership && $quotas_consumed < $quotas_avaibles){
+			    			//echo ("procedo a actualizar los cupos");
+
+			    			if(HelperOSappscheduleSubscription::setQuotasPlanSubscription($subscription_id)){
+			    				//asocia el item de la orden con la subscription, asi despues asociar el detalle
+								$db->setQuery("UPDATE #__app_sch_order_items SET subscription_id = ' ".$subscription_id."' WHERE id = '".$order_item_id."'");
+								$db->query();
+			    				
+			    				$quotas_consumed++;
+			    			}
+
+			    			//check if only have one quote avaiable
+			    			if( ($remainder_quotas > 0) &&  
+			    				(($quotas_avaibles - $quotas_consumed) <= $remainder_quotas) && 
+			    				($quotas_avaibles - $quotas_consumed) > 0){
+			    				//send email
+			    				HelperOSappscheduleSubscription::sendLastQuoteEmails($subscription_id, $remainder_quotas);
+			    			}
+
+			    			//check if whit this new discountm , i consummed last quota
+			    			if($quotas_consumed == $quotas_avaibles){
+			    				//close subscription
+			    			    HelperOSappscheduleSubscription::setConsummedMembershipPlans($subscription_id);
+			    			}
+			    			//break forach, no need check anothers plans
+			    			break;
+
+			    		}
+			    		else
+			    		{
+			    			//HelperOSappscheduleSubscription::setConsummedMembershipPlans($subscription_id);
+			    			continue;
+			    		}
+			    	}
 				}
 				//break;
 			}
@@ -729,6 +792,9 @@ class OsAppscheduleDefault{
 				$mainframe->redirect(JURI::root()."index.php?option=com_osservicesbooking&task=default_orderDetailsForm&order_id=".$order_id."&ref=".md5($order_id)."&Itemid=".JRequest::getInt('Itemid',0));
 			}
 		}
+		else{
+			echo "no cookie uniq";
+		}
 	}
 	
 	/**
@@ -766,18 +832,66 @@ class OsAppscheduleDefault{
 		global $mainframe,$configClass;
 		$db = JFactory::getDbo();
 		$id = JRequest::getVar('id',0);
+
 		if($id > 0){
 			$ref = JRequest::getVar('ref','');
 			$ide = md5($id);
 			$cancel_before = $configClass['cancel_before'];
 			$db->setQuery("Select a.start_time from #__app_sch_order_items as a inner join #__app_sch_orders as b on b.id = a.order_id where b.id = '$id' order by a.start_time");
 			$earliest = $db->loadResult();
+
+			$config = new JConfig();
+			$offset = $config->offset;
+			date_default_timezone_set($offset);
 			
 			$current_time = HelperOSappscheduleCommon::getRealTime();
-			if(($current_time + $cancel_before*3600 < $earliest) and ($ide == $ref)){			
+			if( ($current_time + $cancel_before*3600 < $earliest) and ($ide == $ref)) {			
 				$db->setQuery("UPDATE #__app_sch_orders SET order_status = 'C' WHERE id = '$id'");
 				$db->query();
-				
+
+				$quotas_qty = count($orders);
+
+				$subscription_sql = $db->setQuery("Select a.subscription_id from #__app_sch_order_items as a inner join #__app_sch_orders as b on b.id = a.order_id where b.id = '$id'");
+				$subscription_id  = $db->loadResult();
+
+				$subscription_plan = HelperOSappscheduleSubscription::getSubscription($subscription_id);
+
+				//cupos disponibles por plan
+	    		$quotas_avaibles = $subscription_plan->subscription_quotas;
+	    		//cupos consumidos por usuario plan
+	    		$quotas_consumed = $subscription_plan->plan_subscription_quotas;
+	    		//id de susbcripcion
+	    		$subscription_id = $subscription_plan->sid;
+	    		//status
+	    		$published = $subscription_plan->subscription_published;
+	    		$substatus = $subscription_plan->plan_subscription_status;
+
+    			//must be discount to current active plan y deben quedar cupos, sino quedan cupos, debera estar consumido y caera en el else no subscription active
+	    		
+	    		if($subscription_plan->lifetime_membership == 0 && $published == 1 && $substatus <= 1){
+	    			HelperOSappscheduleSubscription::unsetQuotasPlanSubscription($subscription_id);
+	    		}
+	    		//no subscription active, then must be re open last subscription if these subscription is in consummed status
+		    	else if($substatus == 5 && $published == 5)
+		    	{
+		    		//first reactive plan
+		    		if(HelperOSappscheduleSubscription::setReActiveMembershipPlans($subscription_id)){
+		    			//next free quote
+	    				if(HelperOSappscheduleSubscription::unsetQuotasPlanSubscription($subscription_id)){
+	    					$db->setQuery("select oi.start_time, oi.end_time, oi.booking_date, s.service_name from konas_app_sch_orders o  inner join #__app_sch_order_items oi on (o.id = oi.order_id) inner join #__app_sch_services s on (oi.sid = s.id) where o.id = '$id' ");
+							$row = $db->loadObject();
+
+							$orers_details["service_name"] = $row->service_name;
+							$order_details["booking_date"] = $row->booking_date;
+							$order_details["start_time"]   = date($configClass['time_format'],$row->start_time);
+							$order_details["end_time"]     = date($configClass['time_format'],$row->end_time);
+
+	    					HelperOSappscheduleSubscription::sendReActiveEmails($subscription_id,false,1,$order_details);
+	    				}
+	    			}
+
+		    	}
+
 				//send notification email
 				HelperOSappscheduleCommon::sendCancelledEmail($id);
 				HelperOSappscheduleCommon::sendSMS('cancel',$id);
@@ -1700,6 +1814,37 @@ class OsAppscheduleDefault{
 		}
 		HTML_OsAppscheduleDefault::listOrdersHistory($orders);
 	}
+
+	/**
+	 * List all orders history 
+	 *
+	 */
+	function bookingInformation(){
+		global $mainframe,$configClass;
+		$config = new JConfig();
+		$offset = $config->offset;
+		date_default_timezone_set($offset);
+
+		$user = JFactory::getUser();
+
+		$db   = JFactory::getDbo();
+
+		if(intval($user->id) == 0){
+			$mainframe->redirect(JURI::root()."index.php",JText::_('OS_YOU_DONT_HAVE_PERMISSION_TO_GO_TO_THIS_AREA'));
+		}
+
+		$sid = JRequest::getVar('sid',0);
+		$uid      = JRequest::getInt('uid',0);
+		if($uid > 0)
+			$user = JFactory::getUser($uid);
+
+		$db->setQuery("select * from #__app_sch_orders as o inner join #__app_sch_order_items as oi on o.id = oi.order_id inner join #__app_sch_services s on oi.sid = s.id where oi.subscription_id = '$sid' and o.user_id ='$user->id' ");
+
+		$bookings = $db->loadObjectList();
+
+		HTML_OsAppscheduleDefault::listBookingsInformation($bookings);
+	}
+	
 	
 	/**
 	 * Get List of Order
@@ -1930,13 +2075,14 @@ class OsAppscheduleDefault{
 		
 		$createdEvent = null;
 		//if($this->cal_id != ""){
-			try {
+			try 
+			{
 				$createdEvent = $service->events->insert("", $newEvent);
 				$createdEvent_id= $createdEvent->getId();
-			} catch (Google_ServiceException $e) {
+			} 
+			catch (Google_ServiceException $e) 
+			{
 				logIt("svgcal_v3,".$e->getMessage()); 
-//				echo $e->getMessage();
-//				exit;
 			}			
 			
 //		$createdEvent = $gdataCal->insertEvent($newEvent, "http://www.google.com/calendar/feeds/".$this->cal_id."/private/full");
@@ -1974,6 +2120,51 @@ class OsAppscheduleDefault{
 		print_r($return);
 	}
 
+
+	function cancelBooking(){
+		global $mainframe,$configClass,$languages;
+		$db = JFactory::getDbo();
+		$user = JFactory::getUser();
+		$lang = JFactory::getLanguage();
+		$lang = $lang->getTag();	
+
+		//before create the order, checking in the table order first
+		$_unique_cookie = $_COOKIE['unique_cookie'];
+
+		$unique_cookie = JRequest::getVar('unique_cookie');
+		@setcookie('unique_cookie',$unique_cookie,time()+1000,'/');
+
+		$msg = "";
+
+		if( ($unique_cookie != "") && ($_unique_cookie==$unique_cookie)){
+
+			$db->setQuery("Select id from #__app_sch_temp_orders where unique_cookie = '$unique_cookie'");
+			//$db->query();
+			$temp_ids = $db->loadColumn(0);
+			if(count($temp_ids) > 0){
+				$db->setQuery("Delete from #__app_sch_temp_orders where id in (".implode(",",$temp_ids).")");
+				if($db->query()){
+					$db->setQuery("Delete from #__app_sch_temp_order_items where order_id in (".implode(",",$temp_ids).")");
+					if($db->query()){
+						$msg = JText::_(OS_BOOKING_CANCEL_SUCCESS);
+					}
+				}
+				else{
+					$msg = JText::_(OS_BOOKING_CANCEL_FAILURE);
+				}
+			}
+			else
+			{
+				$msg = JText::_(OS_BOOKING_CANCEL_FAILURE);
+			}
+		}
+		else
+		{
+			$msg = JText::_(OS_BOOKING_CANCEL_FAILURE);
+		}
+
+		$mainframe->redirect(JURI::root()."index.php?option=com_osservicesbooking", $msg);
+	}
 
 }
 ?>

@@ -377,6 +377,10 @@ function com_install() {
     		$db->setQuery("ALTER TABLE `#__app_sch_order_items` ADD `gcalendar_event_id` varchar(255) NOT NULL AFTER `additional_information`;");
     		$db->query();
     	}
+        if(!in_array('subscription_id',$fieldArr)){
+            $db->setQuery("ALTER TABLE `#__app_sch_order_items` ADD `subscription_id` INT( 11 ) AFTER `additional_information`;");
+            $db->query();
+        }
     }
     
     $db->setQuery("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$dbname' AND table_name = '".$prefix."app_sch_service_time_custom_slots'");

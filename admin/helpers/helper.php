@@ -158,7 +158,7 @@ class OSBHelper
 		return $configClass;
 	}
 	
-/**
+	/**
 	 * Get field suffix used in sql query
 	 *
 	 * @return string
@@ -170,10 +170,12 @@ class OSBHelper
 		{
 			if (!$activeLanguage)
 				$activeLanguage = JFactory::getLanguage()->getTag();
+
+				//$prefix = '_' . substr(self::getDefaultLanguage(), 0, 2);//hgarzo
 			if ($activeLanguage != self::getDefaultLanguage())
 			{
 				$prefix = '_' . substr($activeLanguage, 0, 2);
-			}
+			} 
 		}
 		return $prefix;
 	}
@@ -1259,9 +1261,9 @@ class OSBHelper
 				?>
 				</span>
 				<?php if($configClass['allow_cancel_request'] == 1){?>
-				<a href="javascript:removeItemCalendar(<?php echo $row->order_id?>,<?php echo $row->id?>,<?php echo $row->sid?>,<?php echo $row->eid?>,<?php echo $i?>,'<?php echo $day?>','<?php echo JText::_('OS_DO_YOU_WANT_T0_REMOVE_ORDER_ITEM')?>','<?php echo JURI::root()?>');" title="<?php echo JText::_('OS_CLICK_HERE_TO_REMOVE_ITEM')?>">
-					<img src="<?php echo JURI::root()?>components/com_osservicesbooking/style/images/icon-16-deny.png" border="0"/>
-				</a>
+				<!--<a href="javascript:removeItemCalendar(<?php /*echo $row->order_id*/?>,<?php /*echo $row->id*/?>,<?php /*echo $row->sid*/?>,<?php /*echo $row->eid*/?>,<?php /*echo $i*/?>,'<?php /*echo $day*/?>','<?php /*echo JText::_('OS_DO_YOU_WANT_T0_REMOVE_ORDER_ITEM')*/?>','<?php /*echo JURI::root()*/?>');" title="<?php /*echo JText::_('OS_CLICK_HERE_TO_REMOVE_ITEM')*/?>">
+					<img src="<?php /*echo JURI::root()*/?>components/com_osservicesbooking/style/images/icon-16-deny.png" border="0"/>
+				</a>-->
 				<BR />
 				<?php
 				}
@@ -3414,19 +3416,10 @@ class OSBHelper
 		return implode(",",$tempArr);
 	}
 	
-	public static function encrypt_decrypt($action, $string) {
-		//$plain_txt = "This is my plain text";
-		//
-		//$encrypted_txt = encrypt_decrypt('encrypt', $plain_txt);
-		//echo "Encrypted Text = $encrypted_txt\n";
-		//echo "<br />";
-		//$decrypted_txt = encrypt_decrypt('decrypt', $encrypted_txt);
-		//echo "Decrypted Text = $decrypted_txt\n";
+
+	public static function encrypt_decrypt($action, $string) 
+	{
 	   $output = false;
-	   
-	//	if(function_exists( 'mcrypt_module_open' ) == false){
-	//		logIt("Encryption module mcrypt is not enabled, some data is not being encrypted. For better security you should enable mcrypt.", "be_func2", "", "");
-	//	}
 		
 		if(function_exists( 'mcrypt_module_open' ) == false || $string == "" || $string == null){
 			return $string;

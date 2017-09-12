@@ -34,10 +34,11 @@ class HelperOSappscheduleCalendar{
 	 */
 	function initCalendar($year,$month,$category,$employee_id,$vid,$date_from,$date_to,$ajax=0){
 		global $mainframe,$configClass;
-		$realtime					= HelperOSappscheduleCommon::getRealTime();
-		$current_month 				= intval(date("m",$realtime));
-		$current_year				= intval(date("Y",$realtime));
-		$current_date				= intval(date("d",$realtime));
+		$realtime		= HelperOSappscheduleCommon::getRealTime();
+		$current_month 	= intval(date("m",$realtime));
+		$current_year	= intval(date("Y",$realtime));
+		$current_date	= intval(date("d",$realtime));
+        $current_hour   = intval(date("H",$realtime));
 
 		if($date_from != ""){
 			$date_from_array = explode(" ",$date_from);
@@ -223,25 +224,63 @@ class HelperOSappscheduleCalendar{
 
                         for($i=1;$i<=$number_days_in_month;$i++){
                             $j++;
-
+                            
                             //check to see if today
                             $today = strtotime($current_year."-".$current_month."-".$current_date);
                             $checkdate = strtotime($year."-".$month."-".$i);
-                            if($today > $checkdate){
-                                $classname = "btn btn-gray";
+                            //$todaydesface = strtotime($current_year."-".$current_month."-".$current_date." ".$current_hour ."+ ".$configClass['employee_booking_only_today_desface']." hours" );
+                            if($today > $checkdate){//remplazar today por today desface
+                            
+                                $classname = "btn btn-gray disabled";
                                 $show_link = 0;
                             }
                             elseif(($date_from != "") and ($date_from_int > $checkdate)){
-                                $classname = "btn btn-gray";
+                            
+                                $classname = "btn btn-gray disabled";
                                 $show_link = 0;
                             }
                             elseif(($date_to != "") and ($date_to_int < $checkdate)){
-                                $classname = "btn btn-gray";
+                            
+                                $classname = "btn btn-gray disabled";
                                 $show_link = 0;
                             }else{
-
-                                $show_link = 1;
-                                if($configClass['disable_calendar_in_off_date'] == 1)
+                                if($configClass['employee_booking_only_today'] == 1){
+                                  $hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+                                  $today_desface = new DateTime();
+                                  $today_desface->modify("+{$hours_desface} hours");
+                                
+                                  $desface_month 	= $today_desface->format('m');
+                          		    $desface_year		= $today_desface->format('Y');
+                            		  $desface_date		= $today_desface->format('d');
+                                  
+                                  if(($i == $current_date) and ($month == $current_month) and ($year == $current_year)){
+                    
+                                    if(($i == $desface_date) and ($month == $desface_month) and ($year == $desface_year)){
+                                      $show_link = 1;
+                                    }
+                                    else
+                                    {
+                                      $classname = "btn btn-gray disabled";
+                                      $show_link = 0;
+                                    }
+                                  }
+                                  else
+                                  {
+                                    if(($i == $desface_date) and ($month == $desface_month) and ($year == $desface_year))
+                                      $show_link = 1;
+                                    else{
+                                      $classname = "btn btn-gray disabled";
+                                      $show_link = 0;
+                                    }
+                                    
+                                  }
+                                }
+                                else
+                                {
+                                  $show_link = 1;
+                                }
+                     //6/7           
+                                if($configClass['employee_booking_only_today'] == 0 && $configClass['disable_calendar_in_off_date'] == 1)
                                 {
                                     $services  = OSBHelper::getServices($category,$employee_id,$vid);
                                     $employees = OSBHelper::loadEmployees($services,$employee_id,$checkdate,$vid);
@@ -252,25 +291,57 @@ class HelperOSappscheduleCalendar{
                                     if(($i == $current_date) and ($month == $current_month) and ($year == $current_year)){
                                         $classname = $configClass['calendar_currentdate_style'];
                                     }elseif(OSBHelper::isOffDay($checkdate)){
-                                        $classname = "btn btn-gray";
+                                        $classname = "btn btn-gray disabled";
                                         $show_link = 0;
                                     }elseif(count($services) == 0){
-                                        $classname = "btn btn-gray";
+                                        $classname = "btn btn-gray disabled";
                                         $show_link = 0;
                                     }elseif(! $employees){
-                                        $classname = "btn btn-gray";
+                                        $classname = "btn btn-gray disabled";
                                         $show_link = 0;
                                     }elseif($venue_check == 0){
-                                        $classname = "btn btn-gray";
+                                        $classname = "btn btn-gray disabled";
                                         $show_link = 0;
                                     }else{
                                         $classname = $configClass['calendar_normal_style'];
                                     }
                                 }else {
-                                    if(($i == $current_date) and ($month == $current_month) and ($year == $current_year)){
+                                    if($configClass['employee_booking_only_today'] == 1){
+                                      $hours_desface = ($configClass['employee_booking_only_today_desface'] > 0) ? $configClass['employee_booking_only_today_desface'] : 0;
+                                      $today_desface = new DateTime();
+                                      $today_desface->modify("+{$hours_desface} hours");
+                                    
+                                      $desface_month 	= $today_desface->format('m');
+                              		    $desface_year		= $today_desface->format('Y');
+                                		  $desface_date		= $today_desface->format('d');
+                                      
+                                      if(($i == $current_date) and ($month == $current_month) and ($year == $current_year)){
+                        
+                                        if(($i == $desface_date) and ($month == $desface_month) and ($year == $desface_year)){
+                                          $classname = $configClass['calendar_currentdate_style'];
+                                        }
+                                        else
+                                        {
+                                          //$classname = $configClass['calendar_normal_style'];
+                                        }
+                                      }
+                                      else
+                                      {
+                                        if(($i == $desface_date) and ($month == $desface_month) and ($year == $desface_year))
+                                          $classname = $configClass['calendar_currentdate_style'];
+                                        else{
+                                          //$classname = $configClass['calendar_normal_style'];
+                                        }
+                                        
+                                      }
+                                    }
+                                    else{
+                                      if(($i == $current_date) and ($month == $current_month) and ($year == $current_year)){
                                         $classname = $configClass['calendar_currentdate_style'];
-                                    }else{
-                                        $classname = $configClass['calendar_normal_style'];
+                                      }else{
+                                          if($configClass['employee_booking_only_today'] == 0)
+                                            $classname = $configClass['calendar_normal_style'];
+                                      }
                                     }
                                 }
                             }
@@ -898,9 +969,14 @@ class HelperOSappscheduleCalendar{
                             <?php
                         }
 					}else{
+                        //fix date in week by default depended of params in config
+                        
 						$dateformat_int = strtotime($dateformat);
 						$date_in_week = date("N",$dateformat_int);
 						$db->setQuery("Select * from #__app_sch_custom_time_slots where sid = '$sid' and id in (Select time_slot_id from #__app_sch_custom_time_slots_relation where date_in_week = '$date_in_week') order by start_hour,start_min");
+
+                        //echo "Select * from konas_app_sch_custom_time_slots where sid = '{$sid}' and id in (Select time_slot_id from konas_app_sch_custom_time_slots_relation where date_in_week = '{$date_in_week}') order by start_hour,start_min";
+                        
 						$rows = $db->loadObjectList();
 						
 						?>
@@ -966,7 +1042,9 @@ class HelperOSappscheduleCalendar{
 								$bslots = $db->loadObject();
 								$count_book = $bslots->bnslots;
 								$avail = $nslots - $count - $count_book;
+
 								if($avail <= 0){
+                                    //echo "avail <= 0";
 									$bgcolor = $configClass['timeslot_background'];
 									$nolink = true;
 								}else{
@@ -977,6 +1055,7 @@ class HelperOSappscheduleCalendar{
 								if(($date[2] == date("Y",$realtime) and ($date[1] == intval(date("m",$realtime))) and ($date[0] == intval(date("d",$realtime))))){
 									//today
 									if($start_time_int <= $realtime){
+                                        //echo "start_time_int <= realtime";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
@@ -984,12 +1063,14 @@ class HelperOSappscheduleCalendar{
 								
 								if($disable_booking_before > 1){
 									if($start_time_int < $disable_time){
+                                       // echo "start_time_int < disable_time";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
 								}
 								if($disable_booking_after > 1){
 									if($start_time_int > $disable_time_after){
+                                       // echo "start_time_int > disable_time_after";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
@@ -997,10 +1078,12 @@ class HelperOSappscheduleCalendar{
 								
 								if($configClass['multiple_work'] == 0){
 									if(!OSBHelper::checkMultipleEmployees($sid,$eid,$start_time_int,$end_time_int)){
+                                       // echo "!OSBHelper::checkMultipleEmployees";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
 									if(!OSBHelper::checkMultipleEmployeesInTempOrderTable($sid,$eid,$start_time_int,$end_time_int)){
+                                       // echo "!OSBHelper::checkMultipleEmployeesInTempOrderTable";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
@@ -1008,10 +1091,12 @@ class HelperOSappscheduleCalendar{
 
 								if($configClass['disable_timeslot'] == 0){
 									if(!OSBHelper::checkMultipleServices($sid,$eid,$start_time_int,$end_time_int)){
+                                        //echo "OSBHelper::checkMultipleServices";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
 									if(!OSBHelper::checkMultipleServicesInTempOrderTable($sid,$eid,$start_time_int,$end_time_int)){
+                                        //echo "!OSBHelper::checkMultipleServicesInTempOrderTable";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
@@ -1025,23 +1110,27 @@ class HelperOSappscheduleCalendar{
 										if(($employee->start_time < $start_time_int) and ($end_time_int < $employee->end_time)){
 											//echo "1";
 											if(($avail <= 0) or ($employee->show == 0)){
+                                                //echo "(avail <= 0) or (employee->show == 0)";
 												$bgcolor = "gray";
 												$nolink = true;
 											}
 										}elseif(($employee->start_time > $start_time_int) and ($employee->start_time < $end_time_int)){
 											//echo "2";
 											if(($avail <= 0) or ($employee->show == 0)){
+                                                //echo "(avail <= 0) or (employee->show == 0)";
 												$bgcolor = "gray";
 												$nolink = true;
 											}
 										}elseif(($employee->end_time > $start_time_int) and ($employee->end_time < $end_time_int)){
 											//echo "3";
 											if(($avail <= 0) or ($employee->show == 0)){
+                                                //echo "(avail <= 0) or (employee->show == 0)";
 												$bgcolor = "gray";
 												$nolink = true;
 											}
 										}elseif(($employee->start_time <= $start_time_int) and ($employee->end_time >= $end_time_int)){
 											if(($avail <= 0) or ($employee->show == 0)){
+                                                //echo "(avail <= 0) or (employee->show == 0)";
 												$bgcolor = "gray";
 												$nolink = true;
 											}
@@ -1058,20 +1147,24 @@ class HelperOSappscheduleCalendar{
 										}
 									}
 								}
+                                
 								if($disable_booking_before > 1){
 									if($start_time_int < $disable_time){
+                                        //echo "start_time_int < disable_time";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
 								}
 								if($disable_booking_after > 1){
 									if($start_time_int > $disable_time_after){
+                                       // echo "start_time_int > disable_time_after";
 										$bgcolor = "gray";
 										$nolink  = true;
 									}
 								}
 
 								if($avail <= 0){
+                                    //echo "avail <= 0";
 									$bgcolor = $configClass['timeslot_background'];
 									$nolink = true;
 								}
@@ -1172,7 +1265,7 @@ class HelperOSappscheduleCalendar{
                                         if(($end_time_int <= $endtimetoday) and ($start_time_int >= $starttimetoday)){
                                             $j++;
                                             $show_no_timeslot_text = 0;
-											if($avail > 0){
+											if(!$nolink){
                                             ?>
 												<div class="timeslots divtimecustomslots_simple" style="background-color:<?php echo $bgcolor?> !important;"
 													 onclick="javascript:addBookingSimple('<?php echo $start_time_int?>','<?php echo $end_time_int;?>','<?php echo date($configClass['date_format'],$start_time_int);?> <?php echo date($configClass['time_format'],$start_time_int);?>','<?php echo date($configClass['date_format'],$end_time_int)?> <?php echo date($configClass['time_format'],$end_time_int)?>',<?php echo $eid?>,<?php echo $sid?>,'<?php echo JText::_('OS_SUMMARY');?>','<?php echo JText::_('OS_FROM');?>','<?php echo JText::_('OS_TO');?>','ctimeslots<?php echo $sid ?>_e<?php echo $eid ?>_<?php echo $start_time_int?>','<?php echo $bgcolor ?>');"
@@ -1388,7 +1481,8 @@ class HelperOSappscheduleCalendar{
 				<div class="span12" style="text-align:center;">
 					<div id="summary_<?php echo $sid?>_<?php echo $eid?>" style="padding:2px;text-align:left;" class="sumarry_div">
 					</div>
-					<input type="button" name="addtocartbtn" class="<?php echo $configClass['calendar_normal_style']?>" value="<?php echo JText::_('OS_ADD_TO_CART')?>" onclick="javascript:addtoCart(<?php echo $sid?>,<?php echo $eid?>,<?php echo $service_total_int;?>)" />
+
+					<input type="button" name="addtocartbtn" class="<?php echo $configClass['calendar_normal_style']?>" value="<?php echo ($configClass['employee_booking_only_today'] == 0) ? JText::_('OS_ADD_TO_CART') : JText::_('OS_BOOK_TIME') ?>" onclick="javascript:addtoCart(<?php echo $sid?>,<?php echo $eid?>,<?php echo $service_total_int;?>)" />
 				</div>
 			</div>
 			<?php
