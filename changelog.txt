@@ -1,0 +1,160 @@
+CHANGE LOG:
+Version 2.4.4 March 2016)
+	1. Add feature: Disable service when one employee is booked in case One service and more than one employees
+	2. Fix error - Missing time slot: add order at back-end side
+	3. Add week day in Additional cost of employees
+	4. Fix issue - Missting Confirm button in Confirmation page
+
+Version 2.4.3 Jan 2016)
+	1. Add Required status for field option - custom extra fields
+	2. Add Ordering status for field option - custom extra fields
+	3. Limit word in description of Categories, Servides in listing view
+	4. Back-end ACL Improvement
+	5. Mobile layout improvement
+	6. Remove tabdrop
+
+Version 2.4.2 (Dec 2015)
+	1. Add QR code + Check-in function
+                  2. Add Checkin status for each item of order
+                  3. Add customer balance allow user to pay from their balance through Prepaid payment plugin
+                  4. Re-touch Cpanel layout + add submenus
+                  5. Added Access permission for Check-in funtion
+
+Version 2.4.1 (Oct 2015)
++ Bug fixed 
+	1. Simple booking layout
+	2. Can't select another services after adding item to cart
+	3. Payment plugin installation
+
+Version 2.4.0 (Aug 2015)
++ New features
+	1. Add new time slots theme: Simple time slots theme
+	2. Moving Service information into top part of booking table page when having 1 service
+	3. Option to change tabs to dropdown select list
+	4. Add Services layout with Grid and List view
+	5. Add Grid view for Category layout
+	6. Add Grid view for Employee layout
+	7. Add Income Graph at Dashboard of OS Services Booking (Back-end side)
+	8. Add feature to check Latest OS Services Booking version. 
+
+
+Version 2.3.7 (July 2015)
++ New features
+	- Changing JS Alert to jQuery Dialog after adding timeslot into cart
+	- Update Customer name and email after selecting user at Back-end > Add/Edit Order details
+	- Duplicate Services and Employees
+	- Add option to hide Employee's Cost
+
+Version 2.3.6 (June 2015)
++ New features
+	- Flexible Service Price: From this version, you are able to override Service’s price by dates in week or special date periods
+	- Early Bird Discount: In each Service, you can setup the Early Bird discount (percentages or fixed amount) when customer make booking request early. 
+	- Discount by number Timeslots added: With Custom Time Slots Service, you can setup the discount (percentages or fixed amount) when customer add more than X seat into cart per session. 
+	- Add custom break time for employee on specific Service: In Previous version, administrator only can add the Break Time for one employee on Service by dates in week (Monday to Sunday). But from this version, administrator can add custom break time for specific date too. 
+	- New Order status: From this version, each order will have statuses: Pending, Completed, Canceled, Attended, Timeout, Refunded, Declined. Administrator also is able to change Order status in Orders list instead of going to Order details as previous version. Note: The Refunded is just Order status, OS Services Booking doesn’t process refund the money back to customer. 
+	- New Configure options: The Configuration page of OS Services Booking has been re-sorted to make it become more reasonable. We also add new configure options to make OSB become more flexible. Here are some new important configure options added 2.3.6
+	1. Show Calendar box at Confirmation page
+	2. Select Joomla user group which can bypass the Payment step (suitable in case administrator make the booking request at front-end)
+	3. Turn on/off Early Bird Discount
+	4. Turn on/off Showing “Number time slots request” input box in Booking table page. Set default is 1. 
+	5. Hide Tab Service/ Employee when there is only one item available
+	6. Layout configure options
+	- Content plugin: Allow you to add booking table page into one Article. 
+
+
+Version 2.3.5 (5th May 2015)
++ Added: 
+          - Ajax Loading
+          - AcyMailing integration
+          - Joomla User Profile integration
+
+Version 2.3.4 (2nd February 2015)
++ Added: 
+          - Joomla multiple languages
+          - Access levels for Services
+          - EzTexting SMS API
+          - Stripe, Authorize SIM payment gateways
+
+Version 2.3.3 (15th December 2014)
++ Improved: 
+          - GCalendar Integration with Google API V3
+
+Version 2.3.2 (23th September 2014)
++ Add: 
+          - Step in minutes overwrite
++ Improve: 
+          - Translation tool
+          - Add time slots to Order at Back-end
+
+Version 2.3.1 (22nd August 2014)
++ Add: 
+          - Search module
++ Improve:
+          - Option to turn off Javascript popups
+          - Option to turn off Cart box
+          - New parameters Date from/to for layout: Default layout
+          - Option to turn off Joomla Registration form in Check-out page
+          - Translation tool			
+	
+Version 2.2.2 (22nd June 2014)
++ Add:    
+          - Venues layout
+          - Employees layout
+          - New feature on Top-left Calendar
+
+Version 2.2.1 (23th April 2014)
++ Add:    - Categories layout
+          - Customer's time zone     
+
+
+Version 2.2 (14th April 2014)
++ Add:    - Layout Configuration
+
+
+Version 2.1 (10th March 2014)
++ Added: - Sef urls 
+              - Manage "not working time" for services in specific day
+# Bugs fixed: 
+	- ClickAtell SMS
+
+Version 2.0 (30th August 2013)
++ Added: - Coupon feature
+              - SSL 
+              - reCaptcha
+	- Payment plugins: Eway, Worldpay, Sagepay
+	- Report generation
+              - Database optimize
+(+) Improve: 
+             - Venue feature
+             - Relation between Services and Employees
+#Bugs fixed:
+             - Time slots table
+
+Version 1.5.1 (22nd June 2013)
+#Bugs fixed: 
+	- Employee works list filter (by date from/to)
+	- Time slots table : disable book before/after
+	- Remove break time of employees at back-end of OSB
+
+Version 1.5.0 (12th June 2013)
++ Added: - Responsive layout - Bootstrap twitter
+              - Add booking requests from backend
+              - Additional timezones
+              - More configuration option, they will help you to optimize the booking table layouts.
+# Bug fixed
+	-  Error : Employee can work in multiple services in the same time
+
+
+Version 1.4.1 (18th April 2013)
+# Bugs fixed
+	-  Venue dropdown list in employee modification (Backend)
+  	-  Modal view of Venue in booking page (Frontend)
+	-  Update Czech language package
+
+Version 1.4.0 (14th April 2013)
++ Added : - Venues management
+               - Google Calendar integration
+               - ClickAtell SMS integration
+               - Ability to prevent customers to cancel order request before X hours 
+# Bugs fixed
+	-  Date time format in order lists
