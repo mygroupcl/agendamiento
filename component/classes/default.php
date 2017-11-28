@@ -625,8 +625,14 @@ class OsAppscheduleDefault{
 			
 			$db->setQuery("Select id from #__app_sch_temp_orders where unique_cookie like '$unique_cookie'");
 			$temp_order_id = $db->loadResult();
-			$db->setQuery("Select * from #__app_sch_temp_order_items where order_id = '$temp_order_id'");
+			$db->setQuery("Select * from #__app_sch_temp_order_items where order_id = '$temp_order_id' limit 1");
 			$orders = $db->loadObjectList();
+
+			//forsiacaso
+			$orderitemid = $orders[0]->id;
+
+			$db->setQuery("Delete from #__app_sch_temp_order_items where order_id = '$temp_order_id'");
+			$db->query();
 
 			if(count($orders) > 0){
 				for($i=0;$i<count($orders);$i++){

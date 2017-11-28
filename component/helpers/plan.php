@@ -102,10 +102,12 @@ class HelperOSappscheduleSubscription
 			$query->select('b.*,a.subscription_quotas,a.lifetime_membership, b.id as active_subscription_id, a.remainder_quotas')
 				->from('#__osmembership_plans AS a')
 				->innerJoin('#__osmembership_subscribers AS b ON a.id = b.plan_id')
-				->where('b.user_id = ' . $userId)
-				->where('a.published = 1')
-				->where('(b.plan_subscription_status <= 1 OR b.published <= 1 and (a.lifetime_membership = 1 OR (DATEDIFF(' . $now . ', from_date) >= -1 AND DATE(to_date) >= ' . $now .')))')
+				->where('b.user_id = ' . $userId .' AND a.published = 1')
+				->where('(b.plan_subscription_status <= 1 OR b.published <= 1)')
+				->where('(a.lifetime_membership = 1 OR (DATEDIFF(now(), from_date) >= -1 AND DATE(to_date) >= now()))')
 				->order('b.created_date ASC');
+
+			//echo($query->__toString());
 
 			$db->setQuery($query);
 
